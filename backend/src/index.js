@@ -6,6 +6,9 @@ import { APIs_V1 } from './routes/v1/index.js'
 const app = express()
 const PORT = ENV.PORT
 
+// Middleware
+app.use(express.json())
+
 // Use APIs
 app.use('/api/v1', APIs_V1)
 
