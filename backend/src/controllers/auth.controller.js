@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import User from '../models/user.model.js'
 import bcrypt from 'bcryptjs'
 import { generateToken } from '../libs/utils.js'
+import cloudinary from '../libs/cloudinary.js'
 
 const MIN_PASSWORD_LENGTH = 6
 
@@ -55,21 +56,105 @@ const signup = async (req, res) => {
 			})
 		}
 	} catch (error) {
-		console.error('Error during signup:', error)
+		console.error('Error in signup controller:', error)
 		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 			message: 'Server error. Please try again later.',
 		})
 	}
 }
-const login = (req, res) => {
-	res.send('Login Endpoint')
+const login = async (req, res) => {
+	const { email, password } = req.body
+	try {
+		const user = await User.findOne({ email })
+
+		if (!user) {
+			return res.status(StatusCodes.NOT_FOUND).json({
+				message: 'Invalid credentials.',
+			})
+		}
+
+		const isPasswordValid = await bcrypt.compare(password, user.password)
+
+		if (!isPasswordValid) {
+			return res.status(StatusCodes.UNAUTHORIZED).json({
+				message: 'Invalid credentials.',
+			})
+		}
+
+		generateToken(user._id, res)
+
+		return res.status(StatusCodes.OK).json({
+			id: user._id,
+			fullName: user.fullName,
+			email: user.email,
+			profilePic: user.profilePic,
+		})
+	} catch (error) {
+		console.error('Error in login controller:', error)
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			message: 'Internal server error.',
+		})
+	}
 }
 const logout = (req, res) => {
-	res.send('Logout Endpoint')
+	try {
+		res.cookie('token', '', {
+			maxAge: 0,
+		})
+
+		return res
+			.status(StatusCodes.OK)
+			.json({ message: 'Logged out successfully.' })
+	} catch (error) {
+		console.error('Error in logout controller:', error)
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			message: 'Internal server error.',
+		})
+	}
+}
+
+const updateProfile = async (req, res) => {
+	try {
+		const { profilePic } = req.body
+		const userId = req.user._id
+
+		if (!profilePic) {
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				message: 'Profile picture is required.',
+			})
+		}
+
+		const uploadResponse = await cloudinary.uploader.upload(profilePic)
+		const updatedUser = await User.findByIdAndUpdate(
+			userId,
+			{ profilePic: uploadResponse.secure_url },
+			{ new: true }
+		)
+
+		return res.status(StatusCodes.OK).json(updatedUser)
+	} catch (error) {
+		console.error('Error in updateProfile controller:', error)
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			message: 'Server error. Please try again later.',
+		})
+	}
+}
+
+const checkAuth = async (req, res) => {
+	try {
+		res.status(StatusCodes.OK).json(req.user)
+	} catch (error) {
+		console.error('Error in checkAuth controller:', error)
+		return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			message: 'Server error. Please try again later.',
+		})
+	}
 }
 
 export const authController = {
 	signup,
 	login,
 	logout,
+	updateProfile,
+	checkAuth,
 }

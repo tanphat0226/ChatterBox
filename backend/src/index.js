@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser'
 import express from 'express'
 import { ENV } from './configs/environment.js'
 import { connectDB } from './libs/db.js'
@@ -8,6 +9,7 @@ const PORT = ENV.PORT
 
 // Middleware
 app.use(express.json())
+app.use(cookieParser())
 
 // Use APIs
 app.use('/api/v1', APIs_V1)
