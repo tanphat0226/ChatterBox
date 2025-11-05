@@ -30,6 +30,7 @@ export const authMiddleware = async (req, res, next) => {
 
 		// Attach the user object to the request for further use
 		req.user = user
+		console.log(req.user)
 
 		next()
 	} catch (error) {
