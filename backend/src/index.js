@@ -1,4 +1,5 @@
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 import express from 'express'
 import { ENV } from './configs/environment.js'
 import { connectDB } from './libs/db.js'
@@ -8,6 +9,12 @@ const app = express()
 const PORT = ENV.PORT
 
 // Middleware
+app.use(
+	cors({
+		origin: ENV.CLIENT_URL,
+		credentials: true,
+	})
+)
 app.use(express.json())
 app.use(cookieParser())
 
