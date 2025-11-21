@@ -9,6 +9,7 @@ import ProfilePage from './pages/ProfilePage'
 import SettingsPage from './pages/SettingsPage'
 import SignUpPage from './pages/SignUpPage'
 import { useAuthStore } from './store/useAuthStore'
+import { useThemeStore } from './store/useThemeStore'
 
 const ProtectedRoute = ({ user }) => {
 	if (!user) return <Navigate to='/login' replace />
@@ -17,6 +18,8 @@ const ProtectedRoute = ({ user }) => {
 
 const App = () => {
 	const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
+	const { theme } = useThemeStore()
+
 	useEffect(() => {
 		checkAuth()
 	}, [checkAuth])
@@ -29,7 +32,7 @@ const App = () => {
 		)
 
 	return (
-		<div>
+		<div data-theme={theme}>
 			<Navbar />
 
 			<Routes>
