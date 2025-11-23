@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import User from '../models/user.model.js'
 import Message from '../models/message.model.js'
+import cloudinary from '../libs/cloudinary.js'
 
 const getUserForSidebar = async (req, res) => {
 	try {
