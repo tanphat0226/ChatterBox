@@ -17,12 +17,13 @@ const ProtectedRoute = ({ user }) => {
 }
 
 const App = () => {
-	const { authUser, checkAuth, isCheckingAuth } = useAuthStore()
+	const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore()
 	const { theme } = useThemeStore()
 
 	useEffect(() => {
 		checkAuth()
 	}, [checkAuth])
+	console.log(onlineUsers)
 
 	if (isCheckingAuth && !authUser)
 		return (

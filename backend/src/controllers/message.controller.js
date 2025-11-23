@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import User from '../models/user.model.js'
 import Message from '../models/message.model.js'
 import cloudinary from '../libs/cloudinary.js'
+import { getReceiversSocketIds, io } from '../libs/socket.js'
 
 const getUserForSidebar = async (req, res) => {
 	try {
@@ -63,7 +64,12 @@ const sendMessage = async (req, res) => {
 
 		await newMessage.save()
 
-		// TODO: Emit socket event here for real-time message delivery
+		// Emit the new message to the receiver if they are online
+		const receiverSocketId = getReceiversSocketIds(receiverId)
+
+		if (receiverSocketId) {
+			io.to(receiverSocketId).emit('newMessage', newMessage)
+		}
 
 		res.status(StatusCodes.CREATED).json(newMessage)
 	} catch (error) {
