@@ -5,8 +5,10 @@ import { ENV } from './configs/environment.js'
 import { connectDB } from './libs/db.js'
 import { APIs_V1 } from './routes/v1/index.js'
 import { app, server } from './libs/socket.js'
+import path from 'path'
 
 const PORT = ENV.PORT
+const __dirname = path.resolve()
 
 // Middleware
 app.use(
@@ -21,6 +23,15 @@ app.use(cookieParser())
 
 // Use APIs
 app.use('/api/v1', APIs_V1)
+
+// Serve static files in production
+if (ENV.NODE_ENV === 'production') {
+	app.use(express.static(path.join(__dirname, '../frontend/dist')))
+
+	app.get('*', (req, res) => {
+		res.sendFile(path.join(__dirname, '../frontend', 'dist', 'index.html'))
+	})
+}
 
 server.listen(PORT, () => {
 	console.log(`Server is running on http://localhost:${PORT}`)

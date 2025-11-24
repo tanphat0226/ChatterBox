@@ -5,13 +5,15 @@
 	"main": "src/index.js",
 	"type": "module",
 	"scripts": {
-		"dev": "node --watch src/index.js"
+		"dev": "node --watch src/index.js",
+		"start": "node src/index.js"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"bcryptjs": "^3.0.2",
+		"chatterbox": "file:..",
 		"cloudinary": "^2.8.0",
 		"cookie-parser": "^1.4.7",
 		"cors": "^2.8.5",
